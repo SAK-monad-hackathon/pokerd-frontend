@@ -1,9 +1,8 @@
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid2';
 import Box from '@mui/material/Box';
 
@@ -121,7 +120,7 @@ export default function DashboardPage() {
 							key={table.id}
 						>
 							<div className="flex justify-between items-center p-4 bg-gray-800">
-								<div className="font-bold">{table.gameType}</div>
+								<div>{table.gameType}</div>
 							</div>
 
 							<div className="p-4">
@@ -144,7 +143,7 @@ export default function DashboardPage() {
 
 								<a
 									href={`/table/${table.id}`}
-									className="block w-full text-center bg-yellow-400 text-black py-3 mt-4 rounded font-bold"
+									className="block w-full text-center bg-yellow-400 text-black py-3 mt-4"
 								>
 									Join Table
 								</a>
