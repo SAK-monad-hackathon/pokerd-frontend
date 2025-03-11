@@ -1,9 +1,11 @@
 import Button from "@mui/material/Button";
+import { usePrivy } from "@privy-io/react-auth";
 import React, { useState, useEffect } from "react";
 
 const PokerTable = () => {
 	const [timeLeft, setTimeLeft] = useState(15);
 	const [raiseAmount, setRaiseAmount] = useState(4.0);
+	const { logout } = usePrivy();
 
 	useEffect(() => {
 		const timer = setInterval(() => {
