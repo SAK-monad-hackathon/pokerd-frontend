@@ -2,9 +2,9 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid2';
-import Box from '@mui/material/Box';
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid2";
+import Box from "@mui/material/Box";
 
 type DiscoverTable = {
 	id: number;
@@ -17,7 +17,7 @@ type DiscoverTable = {
 
 async function discoverTables() {
 	return fetch("/api/discover").then(
-		(res) => res.json() as Promise<DiscoverTable[]>
+		(res) => res.json() as Promise<DiscoverTable[]>,
 	);
 }
 
@@ -97,26 +97,30 @@ export default function DashboardPage() {
 		},
 	];
 
-
-
 	return (
 		<div>
 			<header className="bg-gray-800 px-6 py-4 flex justify-between items-center border-b border-gray-700">
 				<div className="text-2xl font-bold text-yellow-400">Pokerd</div>
-				<Button variant="contained" color="primary"
+				<Button
+					variant="contained"
+					color="primary"
 					onClick={logout}
 					className="bg-yellow-400 text-black px-4 py-2 rounded font-bold"
 				>
 					Logout
-				</Button >
+				</Button>
 			</header>
 
-
 			<Box sx={{ flexGrow: 1 }} className="max-w-6xl text-white mx-auto p-6">
-
-				<Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+				<Grid
+					container
+					spacing={{ xs: 2, md: 3 }}
+					columns={{ xs: 4, sm: 8, md: 12 }}
+				>
 					{tables.map((table) => (
-						<Grid size={{ xs: 2, sm: 4, md: 4 }} className="bg-gray-900 rounded"
+						<Grid
+							size={{ xs: 2, sm: 4, md: 4 }}
+							className="bg-gray-900 rounded"
 							key={table.id}
 						>
 							<div className="flex justify-between items-center p-4 bg-gray-800">
