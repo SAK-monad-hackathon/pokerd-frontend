@@ -3,17 +3,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 export default async function turn(req: NextApiRequest, res: NextApiResponse) {
   req;
   try {
-    // Simulate
-    const turnData = [
-      {
-        value: "Ace",
-        suit: "Diamond",
-      },
-    ];
-    console.log("turnData :", turnData);
+    const request = await fetch("https://pokerd-backend.fly.dev/turn");
+    const data = await request.json();
+    console.log("turnData :", data);
 
-    res.status(200).json(turnData);
+    res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: "Error turn server" });
+    res.status(500).json({ error: "Error river server" });
   }
 }
