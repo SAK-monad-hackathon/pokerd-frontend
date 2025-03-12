@@ -8,6 +8,7 @@ const PokerTable = () => {
   const [timeLeft, setTimeLeft] = useState(15);
   const [raiseAmount, setRaiseAmount] = useState(4.0);
   const { logout } = usePrivy();
+  const [flopCards, setFlopCards] = useState([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -30,6 +31,36 @@ const PokerTable = () => {
     { value: "King", suit: "Diamond" },
     null,
   ];
+  const getFlop = async () => {
+    try {
+      const response = await fetch("/api/flop", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("response :", response);
+      const data = await response.json();
+      console.log("date :", data);
+
+      const formattedFlop = data.map(
+        (card: { value: string; suit: string }) => ({
+          rank: getValueRank(card.value),
+          suit: getSuitSymbol(card.suit),
+          color: ["Heart", "Diamond"].includes(card.suit)
+            ? "text-red-600"
+            : "text-black",
+        }),
+      );
+
+      setFlopCards(formattedFlop);
+    } catch (error) {
+      console.error("Erreur flop client", error);
+    }
+  };
+
+  useEffect(() => {
+    getFlop();
+  }, []);
 
   const playerPositions = [
     { position: "bottom-0 left-1/2 -translate-x-1/2", isCurrentPlayer: true },
@@ -134,7 +165,6 @@ const PokerTable = () => {
 
         <div className="flex justify-center gap-1 mt-1">
           {player.cards ? (
-            // Show cards for current player
             player.cards.map((card: any, i: any) => (
               <Card
                 key={i}
