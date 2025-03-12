@@ -4,7 +4,17 @@ import { usePrivy } from "@privy-io/react-auth";
 import type React from "react";
 import { useState, useEffect } from "react";
 import { getCardColor, getSuitSymbol, getValueRank } from "../../components/utils";
-import type { CardType } from "../../components/types";
+import type { CardType, Player } from "../../components/types";
+import { createPublicClient, http } from 'viem'
+import { monadTestnet } from 'viem/chains'
+import { PokerdAbi } from "../../components/contractAbi";
+
+export const publicClient = createPublicClient({
+	chain: monadTestnet,
+	transport: http()
+  })
+
+
 
 const PokerTable = () => {
   const [timeLeft, setTimeLeft] = useState(15);
@@ -13,6 +23,27 @@ const PokerTable = () => {
   const [flopCards, setFlopCards] = useState<CardType[]>([]);
   const [turnCard, setTurnCard] = useState<CardType | null>(null);
   const [riverCard, setRiverCard] = useState<CardType | null>(null);
+  const [players, setPlayers] = useState<Player[] | null>(null);
+
+ publicClient.watchContractEvent({
+    address: '0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c',
+    abi: PokerdAbi,
+    eventName: 'PlayerJoined',
+    onLogs: logs => setPlayer(logs)
+  })
+  
+  const setPlayer = (logs: any) => {
+    const newPlayer: Player = {
+		address: logs[0].args.player,
+      stack: `$0.00`,
+      bet: "$0.00",
+      cards: null,
+      position: logs[0].args.indexOnTable,
+      isYourTurn: false,
+      handStrength: null,
+    };
+    setPlayers((prevPlayers) => (prevPlayers ? [...prevPlayers, newPlayer] : [newPlayer]));
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
