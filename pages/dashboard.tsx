@@ -40,7 +40,7 @@ export default function DashboardPage() {
   // 	);
   // }
 
-  const { ready, authenticated, logout } = usePrivy();
+  const { ready, authenticated, user, logout } = usePrivy();
   const router = useRouter();
 
   useEffect(() => {
@@ -101,6 +101,7 @@ export default function DashboardPage() {
     <div>
       <header className="bg-gray-800 px-6 py-4 flex justify-between items-center border-b border-gray-700">
         <div className="text-2xl font-bold text-yellow-400">Pokerd</div>
+        <div className="text-1xl text-yellow-400">Address: {user?.wallet?.address}</div>
         <Button
           variant="contained"
           color="primary"
