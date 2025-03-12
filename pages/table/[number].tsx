@@ -51,7 +51,7 @@ const PokerTable = () => {
 
       setFlopCards(formattedFlop);
     } catch (error) {
-      console.error("Erreur flop client", error);
+      console.error("Error flop client", error);
     }
   };
 
@@ -72,7 +72,7 @@ const PokerTable = () => {
 
       setTurnCard(formattedTurn);
     } catch (error) {
-      console.error("Erreur turn client", error);
+      console.error("Error turn client", error);
     }
   };
 
@@ -93,7 +93,7 @@ const PokerTable = () => {
 
       setRiverCard(formattedRiver);
     } catch (error) {
-      console.error("Erreur river client", error);
+      console.error("Error river client", error);
     }
   };
 
@@ -252,7 +252,7 @@ const PokerTable = () => {
 
       <div className="relative w-full h-screen max-h-screen flex items-center justify-center">
         <div className="relative w-full max-w-4xl h-96 bg-green-800 rounded-full border-8 lg:border-12 border-amber-900">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+          <div className="text-center">
             <div className="text-xl lg:text-2xl font-bold mb-2">
               Pot: $12.50
             </div>

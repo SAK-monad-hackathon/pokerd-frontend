@@ -1,4 +1,4 @@
-export const getValueRank = (value: string | undefined) => {
+export const getValueRank = (value: string) => {
   switch (value) {
     case "Ace":
       return "A";
@@ -31,7 +31,7 @@ export const getValueRank = (value: string | undefined) => {
   }
 };
 
-export const getSuitSymbol = (suit: string | undefined) => {
+export const getSuitSymbol = (suit: string) => {
   switch (suit) {
     case "Spade":
       return "♠";
