@@ -33,48 +33,44 @@ const PokerTable = () => {
     address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
     abi: PokerdAbi,
     eventName: "PlayerJoined",
-    onLogs: (logs) => setPlayer(logs),
+    onLogs: (logs) => {
+      const newPlayer: Player = {
+        address: logs[0]?.args.player as string,
+        stack: `$0.00`,
+        bet: "$0.00",
+        cards: null,
+        position: Number(logs[0]?.args.indexOnTable),
+        isYourTurn: false,
+      };
+      setPlayers((prevPlayers) =>
+        prevPlayers ? [...prevPlayers, newPlayer] : [newPlayer],
+      );
+    },
   });
-
-  const setPlayer = (logs: any) => {
-    const newPlayer: Player = {
-      address: logs[0].args.player,
-      stack: `$0.00`,
-      bet: "$0.00",
-      cards: null,
-      position: logs[0].args.indexOnTable,
-      isYourTurn: false,
-    };
-    setPlayers((prevPlayers) =>
-      prevPlayers ? [...prevPlayers, newPlayer] : [newPlayer],
-    );
-  };
 
   publicClient.watchContractEvent({
     address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
     abi: PokerdAbi,
     eventName: "PlayerLeft",
-    onLogs: (logs) => removePlayerBet(logs),
+    onLogs: (logs) => {
+      setPlayers(
+        (prevPlayers) =>
+          prevPlayers?.filter(
+            (player) =>
+              logs[0]?.args.player && player.address !== logs[0].args.player,
+          ) || [],
+      );
+    },
   });
-
-  const removePlayerBet = (logs: any) => {
-    setPlayers((prevPlayers) =>
-      prevPlayers
-        ? prevPlayers.filter((player) => player.address !== logs[0].args.player)
-        : [],
-    );
-  };
 
   publicClient.watchContractEvent({
     address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
     abi: PokerdAbi,
     eventName: "PlayerBet",
-    onLogs: (logs) => updatePlayerBet(logs),
+    onLogs: (logs) => {
+      setPotAmount((prevPot) => prevPot + Number(logs[0]?.args.betAmount));
+    },
   });
-
-  const updatePlayerBet = (logs: any) => {
-    setPotAmount((prevPot) => prevPot + logs[0].args.betAmount);
-  };
 
   useEffect(() => {
     const timer = setInterval(() => {
