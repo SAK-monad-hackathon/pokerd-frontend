@@ -1,31 +1,31 @@
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+// import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 
-type DiscoverTable = {
-  id: number;
-  status: boolean;
-  minBuyIn: number;
-  maxBuyIn: number;
-  smallBlind: number;
-  bigBlind: number;
-};
+// type DiscoverTable = {
+//   id: number;
+//   status: boolean;
+//   minBuyIn: number;
+//   maxBuyIn: number;
+//   smallBlind: number;
+//   bigBlind: number;
+// };
 
-async function discoverTables() {
-  return fetch("/api/discover").then(
-    (res) => res.json() as Promise<DiscoverTable[]>,
-  );
-}
+// async function discoverTables() {
+//   return fetch("/api/discover").then(
+//     (res) => res.json() as Promise<DiscoverTable[]>,
+//   );
+// }
 
-async function joinTableFn(tableId: number) {
-  return fetch(`/api/table/${tableId}`, {
-    method: "POST",
-  }).then((res) => res.json());
-}
+// async function joinTableFn(tableId: number) {
+//   return fetch(`/api/table/${tableId}`, {
+//     method: "POST",
+//   }).then((res) => res.json());
+// }
 
 export default function DashboardPage() {
   // const { data, isLoading } = useQuery({ queryKey: ["discover"], queryFn: discoverTables });

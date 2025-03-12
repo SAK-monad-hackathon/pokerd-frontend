@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function flop(req: NextApiRequest, res: NextApiResponse) {
+  req;
   try {
     // Simulate
     const flopData = [
