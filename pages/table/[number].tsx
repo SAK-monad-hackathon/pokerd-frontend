@@ -1,14 +1,23 @@
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { usePrivy } from "@privy-io/react-auth";
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useState, useEffect } from "react";
 import { getCardColor, getSuitSymbol, getValueRank } from "../utils";
+
+interface CardType {
+  rank: string;
+  suit: string;
+  color: string;
+}
 
 const PokerTable = () => {
   const [timeLeft, setTimeLeft] = useState(15);
   const [raiseAmount, setRaiseAmount] = useState(4.0);
   const { logout } = usePrivy();
-  const [flopCards, setFlopCards] = useState([]);
+  const [flopCards, setFlopCards] = useState<CardType[]>([]);
+  const [turnCard, setTurnCard] = useState<CardType | null>(null);
+  const [riverCard, setRiverCard] = useState<CardType | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -24,13 +33,6 @@ const PokerTable = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const flop = [
-    { value: "Three", suit: "Club" },
-    { value: "Four", suit: "Heart" },
-    { value: "Five", suit: "Club" },
-    { value: "King", suit: "Diamond" },
-    null,
-  ];
   const getFlop = async () => {
     try {
       const response = await fetch("/api/flop", {
@@ -46,15 +48,55 @@ const PokerTable = () => {
         (card: { value: string; suit: string }) => ({
           rank: getValueRank(card.value),
           suit: getSuitSymbol(card.suit),
-          color: ["Heart", "Diamond"].includes(card.suit)
-            ? "text-red-600"
-            : "text-black",
+          color: getCardColor(card.suit),
         }),
       );
 
       setFlopCards(formattedFlop);
     } catch (error) {
       console.error("Erreur flop client", error);
+    }
+  };
+
+  const getTurn = async () => {
+    try {
+      const response = await fetch("/api/turn", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      const formattedTurn: CardType = {
+        rank: getValueRank(data[0].value),
+        suit: getSuitSymbol(data[0].suit),
+        color: getCardColor(data[0].suit),
+      };
+
+      setTurnCard(formattedTurn);
+    } catch (error) {
+      console.error("Erreur turn client", error);
+    }
+  };
+
+  const getRiver = async () => {
+    try {
+      const response = await fetch("/api/river", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      const formattedRiver: CardType = {
+        rank: getValueRank(data[0].value),
+        suit: getSuitSymbol(data[0].suit),
+        color: getCardColor(data[0].suit),
+      };
+
+      setRiverCard(formattedRiver);
+    } catch (error) {
+      console.error("Erreur river client", error);
     }
   };
 
@@ -121,7 +163,7 @@ const PokerTable = () => {
     },
   ];
 
-  const Card = ({ rank, suit, color }: any) => {
+  const Card: React.FC<CardType> = ({ rank, suit, color }) => {
     if (!rank) {
       return <div className="w-12 h-16 lg:w-16 lg:h-20 bg-transparent" />;
     }
@@ -218,15 +260,49 @@ const PokerTable = () => {
               Pot: $12.50
             </div>
             <div className="flex gap-2 justify-center">
-              {flop.map((card, i) => (
+              {flopCards.map((card, i) => (
                 <Card
                   key={i}
-                  rank={getValueRank(card?.value)}
-                  suit={getSuitSymbol(card?.suit)}
-                  color={getCardColor(card?.suit)}
+                  rank={card.rank}
+                  suit={card.suit}
+                  color={card.color}
                 />
               ))}
+              {turnCard && (
+                <Card
+                  rank={turnCard.rank}
+                  suit={turnCard.suit}
+                  color={turnCard.color}
+                />
+              )}
+              {riverCard && (
+                <Card
+                  rank={riverCard.rank}
+                  suit={riverCard.suit}
+                  color={riverCard.color}
+                />
+              )}
             </div>
+
+            {!turnCard && (
+              <Button
+                variant="contained"
+                onClick={getTurn}
+                className="bg-yellow-400 text-black px-4 py-2 rounded font-bold mt-2"
+              >
+                Show Turn Card
+              </Button>
+            )}
+
+            {turnCard && !riverCard && (
+              <Button
+                variant="contained"
+                onClick={getRiver}
+                className="bg-yellow-400 text-black px-4 py-2 rounded font-bold mt-2"
+              >
+                Show River Card
+              </Button>
+            )}
           </div>
 
           {activePlayers.map((player) => (
