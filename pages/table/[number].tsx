@@ -3,8 +3,8 @@ import TextField from "@mui/material/TextField";
 import { usePrivy } from "@privy-io/react-auth";
 import type React from "react";
 import { useState, useEffect } from "react";
-import { getCardColor, getSuitSymbol, getValueRank } from "../utils";
-import type { CardType } from "../types";
+import { getCardColor, getSuitSymbol, getValueRank } from "../../components/utils";
+import type { CardType } from "../../components/types";
 
 const PokerTable = () => {
   const [timeLeft, setTimeLeft] = useState(15);
