@@ -7,6 +7,7 @@ const PokerTable = () => {
 	const [timeLeft, setTimeLeft] = useState(15);
 	const [raiseAmount, setRaiseAmount] = useState(4.0);
 	const { logout } = usePrivy();
+	const [flopCards, setFlopCards] = useState([]);
 
 	useEffect(() => {
 		const timer = setInterval(() => {
@@ -22,13 +23,84 @@ const PokerTable = () => {
 		return () => clearInterval(timer);
 	}, []);
 
-	const communityCards = [
-		{ rank: "A", suit: "♥", color: "text-red-600" },
-		{ rank: "K", suit: "♠", color: "text-black" },
-		{ rank: "7", suit: "♦", color: "text-red-600" },
-		{ rank: "9", suit: "♣", color: "text-black" },
-		null,
-	];
+	const getFlop = async () => {
+		try {
+			const response = await fetch("/api/flop", {
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			console.log("response :", response);
+			const data = await response.json();
+			console.log("date :", data);
+
+			const formattedFlop = data.map(
+				(card: { value: string; suit: string }) => ({
+					rank: getValueRank(card.value),
+					suit: getSuitSymbol(card.suit),
+					color: ["Heart", "Diamond"].includes(card.suit)
+						? "text-red-600"
+						: "text-black",
+				}),
+			);
+
+			setFlopCards(formattedFlop);
+		} catch (error) {
+			console.error("Erreur flop client", error);
+		}
+	};
+
+	useEffect(() => {
+		getFlop();
+	}, []);
+
+	const getValueRank = (value: string) => {
+		switch (value) {
+			case "Ace":
+				return "A";
+			case "Jack":
+				return "J";
+			case "Queen":
+				return "Q";
+			case "King":
+				return "K";
+			case "two":
+				return "2";
+			case "three":
+				return "3";
+			case "four":
+				return "4";
+			case "five":
+				return "5";
+			case "six":
+				return "6";
+			case "seven":
+				return "7";
+			case "eight":
+				return "8";
+			case "nine":
+				return "9";
+			case "ten":
+				return "10";
+			default:
+				return value;
+		}
+	};
+
+	const getSuitSymbol = (suit: string) => {
+		switch (suit) {
+			case "Spade":
+				return "♠";
+			case "Club":
+				return "♣";
+			case "Diamond":
+				return "♦";
+			case "Heart":
+				return "♥";
+			default:
+				return "";
+		}
+	};
 
 	const playerPositions = [
 		{ position: "bottom-0 left-1/2 -translate-x-1/2", isCurrentPlayer: true },
@@ -133,7 +205,6 @@ const PokerTable = () => {
 
 				<div className="flex justify-center gap-1 mt-1">
 					{player.cards ? (
-						// Show cards for current player
 						player.cards.map((card: any, i: any) => (
 							<Card
 								key={i}
@@ -187,7 +258,7 @@ const PokerTable = () => {
 							Pot: $12.50
 						</div>
 						<div className="flex gap-2 justify-center">
-							{communityCards.map((card, i) => (
+							{flopCards.map((card, i) => (
 								<Card
 									key={i}
 									rank={card?.rank}
