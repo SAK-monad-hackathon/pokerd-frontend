@@ -4,12 +4,9 @@ import { usePrivy } from "@privy-io/react-auth";
 import type React from "react";
 import { useState, useEffect } from "react";
 import { getCardColor, getSuitSymbol, getValueRank } from "../utils";
+import { CardType } from "../types";
 
-interface CardType {
-  rank: string;
-  suit: string;
-  color: string;
-}
+
 
 const PokerTable = () => {
   const [timeLeft, setTimeLeft] = useState(15);
