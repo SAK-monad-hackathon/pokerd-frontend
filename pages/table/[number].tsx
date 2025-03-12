@@ -101,13 +101,10 @@ const PokerTable = () => {
 
   const playerPositions = [
     { position: "bottom-0 left-1/2 -translate-x-1/2", isCurrentPlayer: true },
-    { position: "bottom-12 left-1/6", isCurrentPlayer: false },
-    { position: "top-1/2 left-0 -translate-y-1/2", isCurrentPlayer: false },
-    { position: "top-12 left-1/6", isCurrentPlayer: false },
-    { position: "top-0 left-1/2 -translate-x-1/2", isCurrentPlayer: false },
-    { position: "top-12 right-1/6", isCurrentPlayer: false },
-    { position: "top-1/2 right-0 -translate-y-1/2", isCurrentPlayer: false },
-    { position: "bottom-12 right-1/6", isCurrentPlayer: false },
+    { position: "bottom-0", isCurrentPlayer: false },
+    { position: "top-0", isCurrentPlayer: false },
+    { position: "top-0 right-0", isCurrentPlayer: false },
+    { position: "bottom-0 right-0", isCurrentPlayer: false },
   ];
 
   const activePlayers = [
@@ -146,7 +143,7 @@ const PokerTable = () => {
       stack: "$67.25",
       bet: "$2.00",
       cards: null,
-      position: 4,
+      position: 3,
     },
     {
       id: 5,
@@ -154,7 +151,7 @@ const PokerTable = () => {
       stack: "$42.00",
       bet: "$2.00",
       cards: null,
-      position: 6,
+      position: 4,
     },
   ];
 
