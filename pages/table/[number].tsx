@@ -3,46 +3,77 @@ import TextField from "@mui/material/TextField";
 import { usePrivy } from "@privy-io/react-auth";
 import type React from "react";
 import { useState, useEffect } from "react";
-import { getCardColor, getSuitSymbol, getValueRank } from "../../components/utils";
+import {
+  getCardColor,
+  getSuitSymbol,
+  getValueRank,
+} from "../../components/utils";
 import type { CardType, Player } from "../../components/types";
-import { createPublicClient, http } from 'viem'
-import { monadTestnet } from 'viem/chains'
+import { createPublicClient, http } from "viem";
+import { monadTestnet } from "viem/chains";
 import { PokerdAbi } from "../../components/contractAbi";
 
 export const publicClient = createPublicClient({
-	chain: monadTestnet,
-	transport: http()
-  })
-
-
+  chain: monadTestnet,
+  transport: http(),
+});
 
 const PokerTable = () => {
   const [timeLeft, setTimeLeft] = useState(15);
   const [raiseAmount, setRaiseAmount] = useState(4.0);
+  const [potAmount, setPotAmount] = useState(0);
   const { logout } = usePrivy();
   const [flopCards, setFlopCards] = useState<CardType[]>([]);
   const [turnCard, setTurnCard] = useState<CardType | null>(null);
   const [riverCard, setRiverCard] = useState<CardType | null>(null);
   const [players, setPlayers] = useState<Player[] | null>(null);
+  players;
 
- publicClient.watchContractEvent({
-    address: '0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c',
+  publicClient.watchContractEvent({
+    address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
     abi: PokerdAbi,
-    eventName: 'PlayerJoined',
-    onLogs: logs => setPlayer(logs)
-  })
-  
+    eventName: "PlayerJoined",
+    onLogs: (logs) => setPlayer(logs),
+  });
+
   const setPlayer = (logs: any) => {
     const newPlayer: Player = {
-		address: logs[0].args.player,
+      address: logs[0].args.player,
       stack: `$0.00`,
       bet: "$0.00",
       cards: null,
       position: logs[0].args.indexOnTable,
       isYourTurn: false,
-      handStrength: null,
     };
-    setPlayers((prevPlayers) => (prevPlayers ? [...prevPlayers, newPlayer] : [newPlayer]));
+    setPlayers((prevPlayers) =>
+      prevPlayers ? [...prevPlayers, newPlayer] : [newPlayer],
+    );
+  };
+
+  publicClient.watchContractEvent({
+    address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+    abi: PokerdAbi,
+    eventName: "PlayerLeft",
+    onLogs: (logs) => removePlayerBet(logs),
+  });
+
+  const removePlayerBet = (logs: any) => {
+    setPlayers((prevPlayers) =>
+      prevPlayers
+        ? prevPlayers.filter((player) => player.address !== logs[0].args.player)
+        : [],
+    );
+  };
+
+  publicClient.watchContractEvent({
+    address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+    abi: PokerdAbi,
+    eventName: "PlayerBet",
+    onLogs: (logs) => updatePlayerBet(logs),
+  });
+
+  const updatePlayerBet = (logs: any) => {
+    setPotAmount((prevPot) => prevPot + logs[0].args.betAmount);
   };
 
   useEffect(() => {
@@ -280,7 +311,7 @@ const PokerTable = () => {
         <div className="relative w-full max-w-4xl h-96 bg-green-800 rounded-full border-8 lg:border-12 border-amber-900">
           <div className="text-center">
             <div className="text-xl lg:text-2xl font-bold mb-2">
-              Pot: $12.50
+              Pot: ${potAmount}
             </div>
             <div className="flex gap-2 justify-center">
               {flopCards.map((card, i) => (

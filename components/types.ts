@@ -1,5 +1,3 @@
-import { Card } from "@mui/material";
-
 export interface CardType {
   rank: string;
   suit: string;
