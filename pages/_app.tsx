@@ -3,8 +3,22 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import { PrivyProvider } from "@privy-io/react-auth";
 import Layout from "../components/layout";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createConfig } from "@privy-io/wagmi";
+import { monadTestnet } from "viem/chains";
+import { http } from "wagmi";
+import { WagmiProvider } from "@privy-io/wagmi";
+
+const wagmiConfig = createConfig({
+  chains: [monadTestnet],
+  transports: {
+    [monadTestnet.id]: http(),
+  },
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const queryClient = new QueryClient();
+
   return (
     <>
       <Head>
@@ -46,9 +60,13 @@ function MyApp({ Component, pageProps }: AppProps) {
           },
         }}
       >
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <QueryClientProvider client={queryClient}>
+          <WagmiProvider config={wagmiConfig}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </WagmiProvider>
+        </QueryClientProvider>
       </PrivyProvider>
     </>
   );

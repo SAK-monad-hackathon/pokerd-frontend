@@ -9,28 +9,30 @@ import {
   getValueRank,
 } from "../../components/utils";
 import type { CardType, Player } from "../../components/types";
-import { createPublicClient, http } from "viem";
-import { monadTestnet } from "viem/chains";
 import { PokerdAbi } from "../../components/contractAbi";
+import {
+  useReadContract,
+  useWatchContractEvent,
+  useWriteContract,
+} from "wagmi";
 
-export const publicClient = createPublicClient({
-  chain: monadTestnet,
-  transport: http(),
-});
+const POKERD_ADDRESS = "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c" as const;
 
 const PokerTable = () => {
   const [timeLeft, setTimeLeft] = useState(15);
   const [raiseAmount, setRaiseAmount] = useState(4.0);
   const [potAmount, setPotAmount] = useState(0);
+  const [amountToCall, setAmountToCall] = useState<bigint>(0n);
   const { logout } = usePrivy();
   const [flopCards, setFlopCards] = useState<CardType[]>([]);
   const [turnCard, setTurnCard] = useState<CardType | null>(null);
   const [riverCard, setRiverCard] = useState<CardType | null>(null);
   const [players, setPlayers] = useState<Player[] | null>(null);
+  const { writeContract } = useWriteContract();
   players;
 
-  publicClient.watchContractEvent({
-    address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+  useWatchContractEvent({
+    address: POKERD_ADDRESS,
     abi: PokerdAbi,
     eventName: "PlayerJoined",
     onLogs: (logs) => {
@@ -48,8 +50,8 @@ const PokerTable = () => {
     },
   });
 
-  publicClient.watchContractEvent({
-    address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+  useWatchContractEvent({
+    address: POKERD_ADDRESS,
     abi: PokerdAbi,
     eventName: "PlayerLeft",
     onLogs: (logs) => {
@@ -63,8 +65,8 @@ const PokerTable = () => {
     },
   });
 
-  publicClient.watchContractEvent({
-    address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+  useWatchContractEvent({
+    address: POKERD_ADDRESS,
     abi: PokerdAbi,
     eventName: "PlayerBet",
     onLogs: (logs) => {
@@ -85,6 +87,19 @@ const PokerTable = () => {
 
     return () => clearInterval(timer);
   }, []);
+
+  const { data: amountToCallData } = useReadContract({
+    abi: PokerdAbi,
+    address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+    functionName: "amountToCall",
+  });
+
+  useEffect(() => {
+    if (amountToCallData) {
+      console.log("amountToCallData", amountToCallData);
+      setAmountToCall(amountToCallData);
+    }
+  }, [amountToCallData]);
 
   const getFlop = async () => {
     try {
@@ -295,15 +310,22 @@ const PokerTable = () => {
           Logout
         </Button>
       </header>
-      <a
-        href={`/dashboard`}
-        className="block text-center bg-yellow-400 text-black py-3 mt-4"
-      >
-        {" "}
-        Leave table
-      </a>
+      <div className="flex justify-center items-center">
+        <Button
+          className="font-bold text-center bg-yellow-400 text-black"
+          onClick={() =>
+            writeContract({
+              abi: PokerdAbi,
+              address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+              functionName: "leaveTable",
+            })
+          }
+        >
+          Leave table
+        </Button>
+      </div>
 
-      <div className="relative w-full h-screen max-h-screen flex items-center justify-center">
+      <div className="relative w-full pt-20 flex items-center justify-center">
         <div className="relative w-full max-w-4xl h-96 bg-green-800 rounded-full border-8 lg:border-12 border-amber-900">
           <div className="text-center">
             <div className="text-xl lg:text-2xl font-bold mb-2">
@@ -365,13 +387,36 @@ const PokerTable = () => {
         </div>
 
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-3 bg-black p-4 rounded-lg">
-          <Button className="text-white bg-red-600">Fold</Button>
-          <Button className="text-white bg-blue-600">Call $2.00</Button>
+          <Button
+            className="text-white bg-red-600"
+            onClick={() =>
+              writeContract({
+                abi: PokerdAbi,
+                address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+                functionName: "leaveTable",
+              })
+            }
+          >
+            Fold
+          </Button>
+          <Button
+            className="text-white bg-blue-600"
+            onClick={async () => {
+              writeContract({
+                abi: PokerdAbi,
+                address: "0x30A62f3F83e410D2c4b2C58c0F820822E9351e2c",
+                functionName: "bet",
+                args: [amountToCall],
+              });
+            }}
+          >
+            Call ${amountToCall.toString()}
+          </Button>
           <Button className="text-black bg-yellow-500">Raise</Button>
           <TextField
             label="Amount"
             type="number"
-            className="w-40 text-white"
+            className="w-20"
             value={raiseAmount}
             onChange={(e) => setRaiseAmount(Number.parseFloat(e.target.value))}
           />
